@@ -62,7 +62,7 @@ func handleSync(client *asynq.Client, cfg config.Config) gin.HandlerFunc {
 
 		queue := worker.QueueName(req.Priority)
 		task := asynq.NewTask(worker.TaskTypeImageSync, payload)
-		info, err := client.Enqueue(task, asynq.Queue(queue))
+		info, err := client.Enqueue(task, asynq.Queue(queue), asynq.MaxRetry(3))
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("enqueue failed: %v", err)})
 			return
