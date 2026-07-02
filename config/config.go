@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 
+	"github.com/google/go-containerregistry/pkg/authn"
 	"gopkg.in/yaml.v3"
 )
 
@@ -30,6 +31,13 @@ type RegistryConfig struct {
 	URL      string
 	Username string
 	Password string
+}
+
+func (r RegistryConfig) BasicAuth() authn.Authenticator {
+	return authn.FromConfig(authn.AuthConfig{
+		Username: r.Username,
+		Password: r.Password,
+	})
 }
 
 func Load(path string) (*Config, error) {
