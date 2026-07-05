@@ -1,7 +1,8 @@
 ---
 change: image-sync-service
 design-doc: docs/superpowers/specs/2026-07-02-image-sync-service-design.md
-base-ref: none
+base-ref: ee1358e15e7fb056601518f0626ecbf6308b1f3b
+archived-with: 2026-07-02-image-sync-service
 ---
 
 # Image Sync Service — Implementation Plan

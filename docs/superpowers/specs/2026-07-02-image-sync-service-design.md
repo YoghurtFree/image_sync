@@ -2,6 +2,8 @@
 comet_change: image-sync-service
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-07-02-image-sync-service
+status: final
 ---
 
 # Image Sync Service — Technical Design

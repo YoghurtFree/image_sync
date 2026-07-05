@@ -34,7 +34,14 @@ func QueueName(priority string) string {
 func NewServer(cfg config.Config) *asynq.Server {
 	return asynq.NewServer(
 		asynq.RedisClientOpt{Addr: cfg.Redis.Addr, Password: cfg.Redis.Password},
-		asynq.Config{Concurrency: cfg.Asynq.Concurrency},
+		asynq.Config{
+			Concurrency: cfg.Asynq.Concurrency,
+			Queues: map[string]int{
+				"critical": 6,
+				"default":  3,
+				"low":      1,
+			},
+		},
 	)
 }
 

@@ -9,11 +9,11 @@ asynq:
   concurrency: 10
 
 registries:
-  harbor-prod:
-    url: registry.example.com
-    username: admin
-    password: secret
-  acr-cn:
-    url: xxx.azurecr.io
-    username: xxx
-    password: xxx
+  src:
+    url: localhost:5001
+    username: ""
+    password: ""
+  dst:
+    url: localhost:5002
+    username: ""
+    password: ""

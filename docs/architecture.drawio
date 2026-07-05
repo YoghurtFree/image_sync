@@ -1,0 +1,157 @@
+<mxfile host="app.diagrams.net" modified="2026-07-02" agent="Claude" version="24.0.0">
+  <diagram id="image-sync-arch" name="image-sync 架构图">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- 用户 -->
+        <mxCell id="user" value="用户 (API Client)" style="shape=actor;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="340" width="80" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- image-sync-service 外框 -->
+        <mxCell id="service" value="image-sync-service (单进程)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=1;dashPattern=5 5;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="180" y="40" width="700" height="640" as="geometry" />
+        </mxCell>
+
+        <!-- Gin HTTP Server -->
+        <mxCell id="gin" value="Gin HTTP Server (:8080)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="210" y="80" width="640" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- POST /api/v1/sync -->
+        <mxCell id="post_sync" value="POST /api/v1/sync&#xa;handleSync" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="240" y="110" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- GET /api/v1/tasks/:id -->
+        <mxCell id="get_task" value="GET /api/v1/tasks/:id&#xa;handleTaskStatus" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="520" y="110" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- 校验描述 -->
+        <mxCell id="post_desc" value="校验请求 → 检查 registry → Enqueue 任务 → 返回 202 + task_id" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="240" y="165" width="340" height="26" as="geometry" />
+        </mxCell>
+
+        <mxCell id="get_desc" value="Inspector 遍历 3 个队列查询任务状态" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="520" y="165" width="260" height="26" as="geometry" />
+        </mxCell>
+
+        <!-- asynq.Client -->
+        <mxCell id="client" value="asynq.Client&#xa;(入队)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="240" y="270" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- asynq.Inspector -->
+        <mxCell id="inspector" value="asynq.Inspector&#xa;(状态查询)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="550" y="270" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Redis -->
+        <mxCell id="redis" value="Redis&#xa;&#xa;asynq:{critical}:pending&#xa;asynq:{default}:pending&#xa;asynq:{low}:pending" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="410" y="400" width="200" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- asynq.Server -->
+        <mxCell id="server" value="asynq.Server (Worker)&#xa;并发=10&#xa;&#xa;Queues:&#xa;  critical: 6 (高优先)&#xa;  default: 3 (普通)&#xa;  low: 1 (低优先)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=12;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="240" y="550" width="240" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- makeHandleImageSync -->
+        <mxCell id="handler_fn" value="makeHandleImageSync&#xa;&#xa;1. 解析 payload {src, dst, image, tag}&#xa;2. cfg.Registries[src] → srcAuth&#xa;3. cfg.Registries[dst] → dstAuth&#xa;4. 调用 syncer.Copy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="520" y="540" width="280" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- config.yaml -->
+        <mxCell id="config" value="config.yaml&#xa;&#xa;registries:&#xa;  src: {url, username, password}&#xa;  dst: {url, username, password}" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;size=15;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="920" y="260" width="200" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- syncer.Copy -->
+        <mxCell id="syncer" value="syncer.Copy&#xa;&#xa;crane.Pull(srcImage, srcAuth)&#xa;       ↓&#xa;crane.Push(img, dstImage, dstAuth)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;fontSize=12;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="920" y="540" width="240" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- Source Registry -->
+        <mxCell id="src_reg" value="Source Registry" style="shape=mxgraph.aws3.ec2;whiteSpace=wrap;html=1;fillColor=#F58534;strokeColor=#d79b00;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="920" y="700" width="100" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Destination Registry -->
+        <mxCell id="dst_reg" value="Destination Registry" style="shape=mxgraph.aws3.ec2;whiteSpace=wrap;html=1;fillColor=#F58534;strokeColor=#d79b00;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="700" width="100" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- 连线 -->
+
+        <!-- 用户 → POST /api/v1/sync -->
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#666666;strokeWidth=2;" edge="1" source="user" target="post_sync" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 用户 → GET -->
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#666666;strokeWidth=2;dashed=1;" edge="1" source="user" target="get_task" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- POST → asynq.Client -->
+        <mxCell id="e3" value="Enqueue" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#d6b656;strokeWidth=2;fontStyle=1;fontSize=10;" edge="1" source="post_sync" target="client" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- GET → Inspector -->
+        <mxCell id="e4" value="查询" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#d6b656;strokeWidth=2;fontStyle=1;fontSize=10;" edge="1" source="get_task" target="inspector" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Client → Redis -->
+        <mxCell id="e5" value="入队" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#d6b656;strokeWidth=2;fontStyle=1;fontSize=10;" edge="1" source="client" target="redis" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Inspector → Redis -->
+        <mxCell id="e6" value="查询" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#d6b656;strokeWidth=2;fontStyle=1;fontSize=10;dashed=1;" edge="1" source="inspector" target="redis" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Redis → Server -->
+        <mxCell id="e7" value="消费任务" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#82b366;strokeWidth=2;fontStyle=1;fontSize=10;" edge="1" source="redis" target="server" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Server → handler_fn -->
+        <mxCell id="e8" value="分发" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#9673a6;strokeWidth=2;fontStyle=1;fontSize=10;" edge="1" source="server" target="handler_fn" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- handler_fn → syncer -->
+        <mxCell id="e9" value="调用" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#d79b00;strokeWidth=2;fontStyle=1;fontSize=10;" edge="1" source="handler_fn" target="syncer" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- config → handler_fn -->
+        <mxCell id="e10" value="读取凭据" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#999999;strokeWidth=1;dashed=1;fontSize=10;" edge="1" source="config" target="handler_fn" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- syncer → src_reg (pull) -->
+        <mxCell id="e11" value="crane.Pull" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#d79b00;strokeWidth=2;fontStyle=1;fontSize=10;fontColor=#b85450;" edge="1" source="syncer" target="src_reg" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- syncer → dst_reg (push) -->
+        <mxCell id="e12" value="crane.Push" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#d79b00;strokeWidth=2;fontStyle=1;fontSize=10;fontColor=#82b366;" edge="1" source="syncer" target="dst_reg" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 图例 -->
+        <mxCell id="legend" value="数据流:&#xa;1. POST /api/v1/sync → 校验 → Enqueue → 返回 202&#xa;2. asynq.Server 消费任务 → 解析 payload&#xa;3. 读取 registry 认证 → syncer.Copy&#xa;4. crane.Pull(源仓库) → crane.Push(目标仓库)" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;size=15;fillColor=#FFFFFF;strokeColor=#999999;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="180" y="710" width="380" height="100" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
