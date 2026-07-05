@@ -1,5 +1,5 @@
 workflow: tweak
-phase: build
+phase: archive
 context_compression: off
 build_mode: direct
 build_pause: null
@@ -12,9 +12,9 @@ auto_transition: true
 base_ref: a327b90ddfa6a9d27644260a81cd4fa99e856926
 design_doc: null
 plan: null
-verify_result: pending
-verification_report: null
-branch_status: pending
+verify_result: pass
+verification_report: docs/superpowers/reports/2026-07-05-add-readme-verify.md
+branch_status: handled
 created_at: 2026-07-05
-verified_at: null
-archived: false
+verified_at: 2026-07-05
+archived: true
