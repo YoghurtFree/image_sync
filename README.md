@@ -49,7 +49,8 @@ registries:
 ```
 
 - `registries` 是一个 map，key 为 alias（如 `harbor`），API 请求中通过 alias 引用
-- `asynq.concurrency` 控制 Worker 并发数
+- `asynq.concurrency` 控制 Asynq Worker 并发数
+- `redis` 配置供 Asynq 内部使用，服务本身不直接操作 Redis
 
 ## API
 
@@ -108,13 +109,13 @@ GET /api/v1/tasks/:id
 ## 架构
 
 ```
-POST /api/v1/sync → Gin 校验 → Asynq 入队 → Redis
-                                              ↓
-                    GET /api/v1/tasks/:id ← Asynq Worker
-                                              ↓
-                                        crane.Pull(src)
-                                              ↓
-                                        crane.Push(dst)
+POST /api/v1/sync → Gin 校验 → Asynq 入队（优先级队列）
+                                      ↓
+                GET /api/v1/tasks/:id ← Asynq Worker
+                                      ↓
+                                  crane.Pull(src)
+                                      ↓
+                                  crane.Push(dst)
 ```
 
 - 异步处理：接口立即返回 task_id，后台执行镜像拷贝
